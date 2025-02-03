@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联系方式</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f0f0f0;
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        /* 新增二维码样式 */
+       .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+       .qr-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+       .qr-img {
+            width: 200px;
+            height: 200px;
+            margin: 15px auto;
+            display: block;
+        }
+        /* 返回头部 */
+       .back-header {
+            background: #fff;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+       .back-btn {
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+       .back-btn i {
+            margin-right: 8px;
+        }
+       .back-btn:hover {
+            color: #1a3569;
+        }
+        /* 联系方式内容 */
+       .contact-content {
+            background: #fff;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* 各联系方式项 */
+       .contact-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+        }
+       .contact-item:hover {
+            background: #f8f8f8;
+        }
+       .contact-item i {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+       .contact-item span {
+            vertical-align: middle;
+        }
+       .contact-item small {
+            color: #666;
+        }
+        /* 微信二维码弹窗按钮 */
+       .qr-modal button {
+            padding: 8px 20px;
+            background: #09BB07;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+       .qr-modal button:hover {
+            background: #057a05;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 返回头部 -->
+    <div class="back-header">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 返回
+        </a>
+    </div>
+    <!-- 联系方式内容 -->
+    <div class="contact-content">
+        <!-- QQ -->
+        <div class="contact-item" onclick="handleQQ()">
+            <i class="fab fa-qq" style="color:#12B7F5;font-size:24px;margin-right:15px;"></i>
+            <span style="vertical-align:middle;">
+                QQ：334443555<br>
+                <small style="color:#666;">点击发起聊天</small>
+            </span>
+        </div>
+        <!-- 微信 -->
+        <div class="contact-item" onclick="showWeChat()">
+            <i class="fab fa-weixin" style="color:#09BB07;font-size:24px;margin-right:15px;"></i>
+            <span style="vertical-align:middle;">
+                微信：WeChat123456<br>
+                <small style="color:#666;">点击显示二维码</small>
+            </span>
+        </div>
+        <!-- 手机 -->
+        <a href="tel:13812345678" style="text-decoration:none;color:inherit;">
+            <div class="contact-item">
+                <i class="fas fa-phone" style="color:#666;font-size:24px;margin-right:15px;"></i>
+                <span style="vertical-align:middle;">
+                    手机：138-1234-5678<br>
+                    <small style="color:#666;">点击直接拨打</small>
+                </span>
+            </div>
+        </a>
+        <!-- 邮箱 -->
+        <a href="mailto:example@qq.com" style="text-decoration:none;color:inherit;">
+            <div class="contact-item">
+                <i class="fas fa-envelope" style="color:#EA4335;font-size:24px;margin-right:15px;"></i>
+                <span style="vertical-align:middle;">
+                    邮箱：example@qq.com<br>
+                    <small style="color:#666;">点击发送邮件</small>
+                </span>
+            </div>
+        </a>
+    </div>
+    <!-- 微信二维码弹窗 -->
+    <div id="qrModal" class="qr-modal">
+        <div class="qr-box">
+            <h3>微信二维码</h3>
+            <img src="your-wechat-qr-image.jpg" class="qr-img" alt="微信二维码">
+            <p style="color:#666;margin:10px 0;">微信号：WeChat123456</p>
+            <button onclick="closeQR()">关闭</button>
+        </div>
+    </div>
+    <script>
+        // QQ处理函数
+        function handleQQ() {
+            // 移动端跳转QQ
+            if (/Mobile/.test(navigator.userAgent)) {
+                window.location.href = 'mqqwpa://im/chat?chat_type=wpa&uin=334443555';
+            } 
+            // 桌面端提示
+            else {
+                alert('请手动添加QQ：334443555\n或扫描右侧二维码');
+            }
+        }
+        // 显示微信二维码
+        function showWeChat() {
+            document.getElementById('qrModal').style.display = 'flex';
+        }
+        // 关闭二维码
+        function closeQR() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+        // 点击蒙层关闭
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('qrModal')) {
+                closeQR();
+            }
+        }
+    </script>
+</body>
+</html>

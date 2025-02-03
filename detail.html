@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f0f0f0;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 动态详情容器 */
+        .feed-detail {
+            background: #fff;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 15px 10px 0;
+            border-radius: 12px;
+        }
+
+        .feed-detail-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .feed-detail-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .feed-detail-nickname {
+            font-size: 18px;
+            color: #222;
+            font-weight: 500;
+        }
+
+        .feed-detail-time {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .feed-detail-text {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        /* 评论列表 */
+        .comment-list {
+            background: #fff;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 15px 10px 0;
+            border-radius: 12px;
+        }
+
+        .comment-item {
+            display: flex;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comment-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-nickname {
+            font-size: 15px;
+            color: #222;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 500px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, .08);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .nav-icon {
+            text-align: center;
+            font-size: 13px;
+            padding: 8px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .nav-icon i {
+            font-size: 26px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .nav-icon:hover {
+            background: #f8f8f8;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- 详情 -->
+    <div class="feed-detail">
+        <div class="feed-detail-header">
+            <img src="https://www.helloimg.com/i/2025/02/01/679ddf2dba26b.jpeg" class="feed-detail-avatar" alt="头像">
+            <div>
+                <div class="feed-detail-nickname">陆游</div>
+                <div class="feed-detail-time"></div>
+            </div>
+        </div>
+        <div class="feed-detail-text"></div>
+    </div>
+    <!-- 评论列表 -->
+    <div class="comment-list" id="comment-list">
+        <!-- 示例评论 -->
+        <div class="comment-item">
+            <!-- 修正图片路径或使用占位图 -->
+            <img src="/ima/qq.png" class="comment-avatar" alt="头像">
+            <div class="comment-content">
+                <div class="comment-nickname">QQ</div>
+                <div class="comment-text">334443555</div>
+            </div>
+        </div>
+        <div class="comment-item">
+            <!-- 修正图片路径或使用占位图 -->
+            <img src="/ima/wx.png" class="comment-avatar" alt="头像">
+            <div class="comment-content">
+                <div class="comment-nickname">微信</div>
+                <div class="comment-text">IDDDIDDID</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取 URL 中的参数
+        const urlParams = new URLSearchParams(window.location.search);
+        const file = urlParams.get('file');
+
+        if (file) {
+            // 创建 XMLHttpRequest 对象来发起 HTTP 请求
+            const xhr = new XMLHttpRequest();
+            // 配置请求，使用 GET 方法请求对应动态文件
+            xhr.open('GET', `feed/${file}`, true);
+
+            // 监听请求状态变化
+            xhr.onreadystatechange = function () {
+                // 当请求完成且状态码为 200（表示成功）
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 获取响应的 HTML 文本
+                    const feedHtml = xhr.responseText;
+                    // 创建 DOMParser 对象
+                    const parser = new DOMParser();
+                    // 解析 HTML 文本为 Document 对象
+                    const doc = parser.parseFromString(feedHtml, 'text/html');
+                    // 从解析后的 Document 对象中提取动态时间
+                    const feedTime = doc.querySelector('.feed-time')?.textContent || '';
+                    // 获取页面上显示动态时间的元素
+                    const feedDetailTime = document.querySelector('.feed-detail-time');
+                    // 将动态时间更新到页面元素上
+                    feedDetailTime.textContent = feedTime;
+                    // 从解析后的 Document 对象中提取动态文本内容
+                    const feedText = doc.querySelector('.feed-text')?.textContent || '';
+                    // 获取页面上显示动态文本内容的元素
+                    const feedDetailText = document.querySelector('.feed-detail-text');
+                    // 将动态文本内容更新到页面元素上
+                    feedDetailText.textContent = feedText;
+                }
+            };
+
+            // 发送请求
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>

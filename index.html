@@ -1,36 +1,240 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人主页</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>手机QQ空间</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f0f0f0;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 个人资料头图 */
+        .profile-header {
+            position: relative;
+            height: 200px;
+            background: url('https://www.helloimg.com/i/2025/02/01/679ddf31480ae.jpg') no-repeat center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 30px;
+            border-radius: 16px 16px 0 0;
+            margin: 10px 10px 0;
+        }
+
+        .avatar {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            border: 5px solid #fff;
+            border-radius: 50%;
+            z-index: 2;
+            cursor: pointer;
+            /* 去除点击时的默认轮廓 */
+            outline: none;
+        }
+
+        /* 个人信息 */
+        .profile-info {
+            position: relative;
+            z-index: 1;
+            background: #fff;
+            padding: 60px 15px 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 16px 16px;
+            margin: 0 10px;
+        }
+
+        .nickname {
+            font-size: 20px;
+            color: #222;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .signature {
+            color: #888;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        /* 动态列表 */
+        .feed-list {
+            background: #fff;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 15px 10px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            display: flex;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .feed-item:hover {
+            background: #fafafa;
+            transform: none;
+        }
+
+        .feed-item::after {
+            content: ">";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            font-weight: 300;
+        }
+
+        .feed-avatar {
+            display: none;
+        }
+
+        .feed-content {
+            flex: 1;
+        }
+
+        .feed-text {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .feed-time {
+            font-size: 13px;
+            color: #999;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
-    <header>
-        <h1>张三</h1>
-        <p>前端开发者 | 技术爱好者</p>
-    </header>
-    <main>
-        <section>
-            <h2>关于我</h2>
-            <p>你好！我是张三，一名前端开发者，热爱编程和技术探索。</p>
-        </section>
-        <section>
-            <h2>项目</h2>
-            <ul>
-                <li><a href="project1.html">项目一</a></li>
-                <li><a href="#">项目二</a></li>
-                <li><a href="#">项目三</a></li>
-            </ul>
-        </section>
-        <section>
-            <h2>联系我</h2>
-            <p>Email: <a href="mailto:zhangsan@example.com">zhangsan@example.com</a></p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 张三. 保留所有权利。</p>
-    </footer>
+    <!-- 个人资料 -->
+    <div class="profile-header">
+        <img src="https://www.helloimg.com/i/2025/02/01/679ddf2dba26b.jpeg" class="avatar" alt="头像">
+    </div>
+    <div class="profile-info">
+        <div class="nickname">陆游</div>
+        <div class="signature">生活不易，且行且珍惜 🌈</div>
+    </div>
+    <!-- 动态列表 -->
+    <div class="feed-list" id="feed-list"></div>
+
+    <script>
+        const feedList = document.getElementById('feed-list');
+
+        function showError(message, targetElement) {
+            const errorElement = document.createElement('div');
+            errorElement.textContent = message;
+            errorElement.style.color = 'red';
+            errorElement.style.textAlign = 'center';
+            errorElement.style.padding = '10px';
+            targetElement.appendChild(errorElement);
+        }
+
+        function fetchData(url, callback, targetElement) {
+            fetch(url)
+              .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text(); // 获取 HTML 文本内容
+                })
+              .then(data => callback(data))
+              .catch(error => {
+                    console.error('Error fetching data:', error);
+                    showError('获取数据失败，请稍后重试。', targetElement);
+                });
+        }
+
+        // 用于存储所有动态数据
+        const allFeeds = [];
+
+        // 获取动态文件列表
+        fetchData('feedList.json', feedListData => {
+            const feedFiles = JSON.parse(feedListData).feeds;
+            const promises = feedFiles.map(file => {
+                return new Promise((resolve, reject) => {
+                    fetchData(`feed/${file}`, feedHtml => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(feedHtml, 'text/html');
+                        const feedConfig = doc.querySelector('.feed-config');
+                        const showTitle = feedConfig ? feedConfig.dataset.showTitle === 'true' : false;
+                        const feedTitle = doc.querySelector('.feed-title')?.textContent || '';
+                        const feedText = doc.querySelector('.feed-text')?.textContent || '';
+                        const feedTime = doc.querySelector('.feed-time')?.textContent || '';
+                        const feedData = {
+                            showTitle: showTitle,
+                            title: feedTitle,
+                            text: feedText,
+                            time: feedTime,
+                            file: file
+                        };
+                        allFeeds.push(feedData);
+                        resolve();
+                    }, feedList);
+                });
+            });
+
+            Promise.all(promises).then(() => {
+                // 按照时间降序排序
+                allFeeds.sort((a, b) => {
+                    return new Date(b.time) - new Date(a.time);
+                });
+
+                allFeeds.forEach(feedData => {
+                    const feedItem = document.createElement('a');
+                    feedItem.href = `detail.html?file=${feedData.file}`;
+                    feedItem.classList.add('feed-item');
+
+                    const feedContent = document.createElement('div');
+                    feedContent.classList.add('feed-content');
+
+                    const feedTextElement = document.createElement('div');
+                    feedTextElement.classList.add('feed-text');
+                    feedTextElement.textContent = feedData.showTitle ? feedData.title : feedData.text.slice(0, 100);
+
+                    const feedTimeElement = document.createElement('div');
+                    feedTimeElement.classList.add('feed-time');
+                    feedTimeElement.textContent = feedData.time;
+
+                    feedContent.appendChild(feedTextElement);
+                    feedContent.appendChild(feedTimeElement);
+                    feedItem.appendChild(feedContent);
+
+                    feedList.appendChild(feedItem);
+                });
+            });
+        }, feedList);
+    </script>
 </body>
+
 </html>

@@ -1,0 +1,16 @@
+{
+    "contacts": [
+        {
+            "name": "QQ 联系方式",
+            "contactType": "QQ",
+            "contactValue": "334443555",
+            "iconUrl": "/ima/qq.png"
+        },
+        {
+            "name": "微信联系方式",
+            "contactType": "微信",
+            "contactValue": "LLYDDDDD",
+            "iconUrl": "/ima/wx.png"
+        }
+    ]
+}
